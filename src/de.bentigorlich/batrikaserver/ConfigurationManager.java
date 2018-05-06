@@ -6,6 +6,10 @@ import sun.security.krb5.Config;
 
 public class ConfigurationManager
 {
+	//type keys:
+	public static final String key_type = "type";
+
+
 	private        int                  port = 22500;
 	private static ConfigurationManager instance;
 

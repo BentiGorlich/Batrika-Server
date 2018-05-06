@@ -1,6 +1,6 @@
-package de.bentigorlich.batrikaserver.Entities.MessageTypes;
+package de.bentigorlich.batrikaserver.Entities;
 
-public enum MessageTypes
+public enum MessageType
 {
 	message(0),
 	message_received(1),
@@ -56,7 +56,7 @@ public enum MessageTypes
 	profile_picture(39),;
 	int num;
 
-	MessageTypes(int num)
+	MessageType(int num)
 	{
 		this.num = num;
 	}
@@ -66,7 +66,7 @@ public enum MessageTypes
 		return num;
 	}
 
-	public static MessageTypes get(int i)
+	public static MessageType get(int i)
 	{
 		switch(i)
 		{
