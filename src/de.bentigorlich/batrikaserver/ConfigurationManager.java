@@ -1,4 +1,4 @@
-package batrikaserver;
+package de.bentigorlich.batrikaserver;
 
 import sun.security.krb5.Config;
 

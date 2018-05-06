@@ -1,11 +1,14 @@
-package batrikaserver;
+package de.bentigorlich.batrikaserver;
 
-import batrikaserver.Network.NetworkListener;
+import de.bentigorlich.batrikaserver.Network.Client;
+import de.bentigorlich.batrikaserver.Network.NetworkListener;
 
-
+import java.util.ArrayList;
 
 public class Main
 {
+	public static ArrayList<Client> connectedDevices = new ArrayList<>();
+
 	public static void main(String[] args)
 	{
 		new NetworkListener(ConfigurationManager.getInstance().getPort());
