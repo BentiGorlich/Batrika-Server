@@ -1,14 +1,15 @@
 package de.bentigorlich.batrikaserver;
 
-import sun.security.krb5.Config;
-
-
-
 public class ConfigurationManager
 {
 	//type keys:
-	public static final String key_type = "type";
-
+	public static final String key_type      = "type";
+	public static final String key_message   = "message";
+	public static final String key_groupname = "groupname";
+	public static final String key_roomname  = "roomname";
+	public static final String key_username  = "username";
+	public static final String key_password  = "password";
+	public static final String key_email     = "email";
 
 	private        int                  port = 22500;
 	private static ConfigurationManager instance;
@@ -25,6 +26,18 @@ public class ConfigurationManager
 			instance = new ConfigurationManager();
 		}
 		return instance;
+	}
+
+	public static String getRdbmsUsername() {
+		return "root";
+	}
+
+	public static String getRdbmsPassword() {
+		return "";
+	}
+
+	public static String getDBName() {
+		return "batrika";
 	}
 
 	public int getPort()

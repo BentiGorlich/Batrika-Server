@@ -18,17 +18,9 @@ public class InputStreamListener
 	/**
 	 * @return the received String or null if IOException
 	 */
-	public String run()
-	{
-		try
-		{
-			String input = in.readUTF();
-			return input;
-		}
-		catch(IOException e)
-		{
-			e.printStackTrace();
-			return null;
-		}
+	public String run() throws IOException {
+		String input = in.readUTF();
+		System.out.println("got: " + input);
+		return input;
 	}
 }

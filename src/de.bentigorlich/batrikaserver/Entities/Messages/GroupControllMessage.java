@@ -1,4 +1,4 @@
 package de.bentigorlich.batrikaserver.Entities.Messages;
 
-public class GroupControllMessage {
+public class GroupControllMessage extends ControlMessage {
 }
