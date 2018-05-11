@@ -9,6 +9,8 @@ public class ControlMessage extends MessageBase {
 	private String password = ""; //as SHA256 Hash
 	private String email    = "";
 
+	private int sendersID;
+
 	public String getUsername() {
 		return username;
 	}
@@ -48,5 +50,16 @@ public class ControlMessage extends MessageBase {
 	@Override
 	public String toString() {
 		return "[username=" + username + ", email=" + email + ", password=" + password + ", type=" + getType() + "]";
+	}
+
+	/**
+	 * @return true if ControlMessage has username, password and email
+	 */
+	public boolean isValidCreatingUser() {
+		return !username.equals("") && !email.equals("") && !password.equals("");
+	}
+
+	public void setSendersID(int sendersID) {
+		this.sendersID = sendersID;
 	}
 }

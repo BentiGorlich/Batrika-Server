@@ -1,10 +1,16 @@
 package de.bentigorlich.batrikaserver.Network;
 
-import de.bentigorlich.batrikaserver.DataBase.Queries.QueryCreateUser;
+import de.bentigorlich.batrikaserver.Commands.CommandSendLoginFail;
+import de.bentigorlich.batrikaserver.Commands.CommandSendMessageReceived;
+import de.bentigorlich.batrikaserver.Commands.CommandSendSelfInfo;
+import de.bentigorlich.batrikaserver.Commands.CommenadSendCreateUserFail;
+import de.bentigorlich.batrikaserver.DataBase.Queries.QueryCheckUserExists;
 import de.bentigorlich.batrikaserver.DataBase.Queries.QueryGetLogin;
 import de.bentigorlich.batrikaserver.Entities.MessageType;
 import de.bentigorlich.batrikaserver.Entities.Messages.ControlMessage;
+import de.bentigorlich.batrikaserver.Entities.Messages.MediaMessage;
 import de.bentigorlich.batrikaserver.Entities.Messages.MessageBase;
+import de.bentigorlich.batrikaserver.Entities.Messages.TextMessage;
 import de.bentigorlich.batrikaserver.Entities.User;
 import de.bentigorlich.batrikaserver.Main;
 import org.json.JSONObject;
@@ -56,67 +62,93 @@ public class ProcessInput implements Runnable
 				stop();
 				return;
 			}
-			if(client.isLoggedIn) {
-				process(input);
-			}
-			else {
-				waitForLogin(input);
+			MessageBase message = MessageBase.parse(input, this.client.user);
+			if(message != null) {
+				System.out.println("parsed to: " + message.toString());
+				if(client.isLoggedIn) {
+					process(message);
+				}
+				else {
+					waitForLogin(message);
+				}
 			}
 		}
 	}
 
-	private void waitForLogin(JSONObject input) {
-		MessageBase message = MessageBase.parse(input);
-		System.out.println("parsed to: " + message.toString());
-		if(message != null) {
-			if(message instanceof ControlMessage) {
-				ControlMessage controlMessage = (ControlMessage)message;
-				if(message.getType() == MessageType.login) {
-					System.out.println("logging in...");
-					String        username = controlMessage.getUsername();
-					String        password = controlMessage.getPassword();
-					QueryGetLogin qgl      = new QueryGetLogin(username, password);
-					qgl.execute();
-					if(qgl.isLoginCorrect()) {
-						System.out.println("Logged in " + username);
-						User temp = null;
-						for(User user : Main.loggedInUsers) {
-							if(user.getUsername().equals(username)) {
-								temp = user;
-								break;
-							}
-						}
-						if(temp == null) {
-							temp = new User(username);
-							Main.loggedInUsers.add(temp);
-							this.client.user = temp;
-							this.client.isLoggedIn = true;
-							ControlMessage sendSucc = new ControlMessage();
-							sendSucc.setType(MessageType.login);
-							client.send(sendSucc.construct());
-						}
-					}
-					else {
-
-					}
-				}
-				else if(message.getType() == MessageType.user_create) {
-					System.out.println("creating user...");
-					String username = controlMessage.getUsername();
-					String password = controlMessage.getPassword();
-					String email    = controlMessage.getEmail();
-					new QueryCreateUser(username, password, email).execute();
-
-					User temp = new User(username);
-					Main.loggedInUsers.add(temp);
+	private void waitForLogin(MessageBase message) {
+		if(message instanceof ControlMessage) {
+			ControlMessage controlMessage = (ControlMessage)message;
+			if(message.getType() == MessageType.login) {
+				System.out.println("logging in...");
+				String        username = controlMessage.getUsername();
+				String        password = controlMessage.getPassword();
+				QueryGetLogin qgl      = new QueryGetLogin(username, password);
+				qgl.execute();
+				if(qgl.isLoginCorrect()) {
+					System.out.println("Logged in " + username);
+					User temp = Main.getUser(username);
 					this.client.user = temp;
 					this.client.isLoggedIn = true;
+					ControlMessage sendSucc = new ControlMessage();
+					sendSucc.setType(MessageType.login);
+					client.send(sendSucc.construct());
+				}
+				else {
+					new CommandSendLoginFail(this.client).execute();
+				}
+			}
+			else if(message.getType() == MessageType.user_create) {
+				System.out.println("creating user...");
+				if(controlMessage.isValidCreatingUser()) {
+					String               username   = controlMessage.getUsername();
+					String               password   = controlMessage.getPassword();
+					String               email      = controlMessage.getEmail();
+					QueryCheckUserExists userExists = new QueryCheckUserExists(username);
+					if(!userExists.exists()) {
+						User temp = new User(username);
+						Main.users.add(temp);
+						this.client.user = temp;
+						this.client.isLoggedIn = true;
+						new CommandSendSelfInfo(this.client.user).execute();
+					}
+					else {
+						new CommenadSendCreateUserFail(this.client, "This user already exists!").execute();
+					}
+				}
+				else {
+					new CommenadSendCreateUserFail(this.client, "Submitted information is not valid...").execute();
 				}
 			}
 		}
 	}
 
-	private void process(JSONObject input) {
+	private void process(MessageBase message) {
+		if(message instanceof ControlMessage) {
+			ControlMessage cm = (ControlMessage)message;
+			switch(cm.getType()) {
 
+				default:
+					break;
+			}
+		}
+		else if(message instanceof TextMessage) {
+			TextMessage tm = (TextMessage)message;
+			switch(tm.getType()) {
+				case message:
+					tm.getDesintation().send(tm.construct());
+					new CommandSendMessageReceived(this.client.user, tm.getSendersID()).execute();
+					break;
+				default:
+					break;
+			}
+		}
+		else if(message instanceof MediaMessage) {
+			MediaMessage mm = (MediaMessage)message;
+			switch(mm.getType()) {
+
+				default:
+					break;
+			}
+		}
 	}
 }

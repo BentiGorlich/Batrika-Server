@@ -6,25 +6,25 @@ import de.bentigorlich.batrikaserver.Network.Client;
 
 
 
-public class CommandSendLoginFail extends CommandBase {
+public class CommenadSendCreateUserFail extends CommandBase {
 	private Client client;
 	private String message = "";
 
-	public CommandSendLoginFail(Client c) {
+	public CommenadSendCreateUserFail(Client c) {
 		this.client = c;
 	}
 
-	public CommandSendLoginFail(Client c, String message) {
+	public CommenadSendCreateUserFail(Client c, String message) {
+		this.client = c;
 		if(message != null && !message.equals("")) {
 			this.message = message;
 		}
-		this.client = c;
 	}
 
 	@Override
 	public void execute() {
 		ControlMessage cm = new ControlMessage();
-		cm.setType(MessageType.login_fail);
+		cm.setType(MessageType.user_create_fail);
 		cm.setMessage(message);
 		client.send(cm.construct());
 	}

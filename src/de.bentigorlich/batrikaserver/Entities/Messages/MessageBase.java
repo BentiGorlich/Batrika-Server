@@ -2,6 +2,7 @@ package de.bentigorlich.batrikaserver.Entities.Messages;
 
 import de.bentigorlich.batrikaserver.ConfigurationManager;
 import de.bentigorlich.batrikaserver.Entities.MessageType;
+import de.bentigorlich.batrikaserver.Entities.User;
 import org.json.JSONObject;
 
 
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 public abstract class MessageBase {
 
 	private MessageType type;
+	private String      message;
 
 	public MessageType getType() {
 		return type;
@@ -16,7 +18,7 @@ public abstract class MessageBase {
 
 	public abstract JSONObject construct();
 
-	public static MessageBase parse(JSONObject input) {
+	public static MessageBase parse(JSONObject input, User user) {
 		if(input.has(ConfigurationManager.key_type)) {
 			MessageType type = MessageType.get(input.getInt(ConfigurationManager.key_type));
 			if(type == MessageType.media) {
@@ -41,11 +43,14 @@ public abstract class MessageBase {
 					return erg;
 				}
 				else {
-					TextMessage erg = new TextMessage();
-					erg.setType(type);
-					erg.setMessage(input.getString(ConfigurationManager.key_message));
-					erg.setDestination(input.getString(ConfigurationManager.key_username));
-					return erg;
+					if(user != null) {
+						TextMessage erg = new TextMessage(user);
+						erg.setType(type);
+						erg.setMessage(input.getString(ConfigurationManager.key_message));
+						erg.setDestination(input.getString(ConfigurationManager.key_username));
+						erg.setSendersID(input.getInt(ConfigurationManager.key_sendersID));
+						return erg;
+					}
 				}
 			}
 			else {
@@ -69,6 +74,14 @@ public abstract class MessageBase {
 
 	public void setType(MessageType type) {
 		this.type = type;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getMessage() {
+		return this.message;
 	}
 
 	public abstract String toString();

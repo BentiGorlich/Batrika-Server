@@ -7,27 +7,24 @@ import java.sql.SQLException;
 
 
 
-public class QueryGetLogin extends QueryBase {
+public class QueryCheckUserExists extends QueryBase {
+	private String  username = "";
+	private boolean exists   = false;
 
-	private boolean isCorrect = false;
-	private String  username;
-	private String  password;
-
-	public QueryGetLogin(String username, String password) {
+	public QueryCheckUserExists(String username) {
 		this.username = username;
-		this.password = password;
 	}
 
 	@Override
 	public String createSQLstatement() {
-		return "SELECT * FROM user WHERE username='" + username + "' AND password='" + password + "'";
+		return "SELECT * FROM user WHERE username='" + username + "'";
 	}
 
 	@Override
 	public void processResults(ResultSet rs) {
 		try {
 			if(rs.next()) {
-				isCorrect = true;
+				exists = true;
 			}
 		}
 		catch(SQLException e) {
@@ -35,7 +32,7 @@ public class QueryGetLogin extends QueryBase {
 		}
 	}
 
-	public boolean isLoginCorrect() {
-		return isCorrect;
+	public boolean exists() {
+		return exists;
 	}
 }

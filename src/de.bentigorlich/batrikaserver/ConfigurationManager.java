@@ -10,6 +10,7 @@ public class ConfigurationManager
 	public static final String key_username  = "username";
 	public static final String key_password  = "password";
 	public static final String key_email     = "email";
+	public static final String key_sendersID = "sendersID";
 
 	private        int                  port = 22500;
 	private static ConfigurationManager instance;

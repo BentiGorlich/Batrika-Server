@@ -8,9 +8,10 @@ import java.sql.ResultSet;
 
 public class QueryCreateUser extends QueryBase {
 
-	private String username;
-	private String password;
-	private String email;
+	private String  username;
+	private String  password;
+	private String  email;
+	private boolean valid = true;
 
 	public QueryCreateUser(String username, String password, String email) {
 		this.username = username;
